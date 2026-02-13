@@ -123,7 +123,6 @@
     </div>
 
     <script>
-        // GANTI DENGAN URL APPS SCRIPT KAMU
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWbuZmSVJUyb3KNSdiZljxaGB3UnfsAtUT2f29vlAe545VmP5ywhoqoAsIxpFEEBko/exec";
 
         function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
@@ -146,8 +145,6 @@
                 container.innerHTML = "";
 
                 data.forEach((member, index) => {
-                    // Data Mapping (Berdasarkan Sheet Members V2)
-                    // member[0] = ID, member[1] = Owner, member[3] = Brand, member[4] = Logo, member[9] = Likes
                     const card = document.createElement('div');
                     card.style.cssText = `
                         display: flex; align-items: center; background: var(--surf); 
@@ -155,10 +152,10 @@
                         opacity: 0; transform: translateY(10px); animation: fadeUp 0.6s forwards ${index * 0.1}s;
                     `;
 
-                    // Style untuk Top 1
                     const isTop1 = index === 0;
                     const rankColor = isTop1 ? "var(--accent)" : "white";
 
+                    // Bagian member[1] (Owner) dihapus untuk menjaga privasi
                     card.innerHTML = `
                         <div style="width: 35px; font-family: 'JetBrains Mono'; font-weight: 800; color: ${rankColor}; font-size: 14px;">
                             #${index + 1}
@@ -166,7 +163,7 @@
                         <img src="${member[4]}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid #1a1a1a; margin: 0 15px;">
                         <div style="flex-grow: 1;">
                             <div style="font-size: 13px; font-weight: 800; letter-spacing: -0.5px; color: white;">${member[3].toUpperCase()}</div>
-                            <div style="font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px;">${member[1]}</div>
+                            <div style="font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px;">VERIFIED UNIT</div>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-family: 'JetBrains Mono'; color: var(--accent); font-size: 12px; font-weight: 600;">${member[9] || 0}</div>
