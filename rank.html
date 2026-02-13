@@ -51,15 +51,30 @@
         /* CONTENT WRAPPER */
         .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* Custom Loading Style */
-        #loadingText { text-align: center; font-family: 'JetBrains Mono'; font-size: 10px; color: #444; letter-spacing: 4px; margin-top: 20px; text-transform: uppercase; }
-
         .stagger > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
         .sub-head { color: var(--dim); font-size: 11px; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
 
         .rank-container { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; min-height: 200px; }
+
+        /* SKELETON ANIMATION */
+        .skeleton {
+            background: linear-gradient(90deg, #0d0d0d 25%, #1a1a1a 50%, #0d0d0d 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card {
+            display: flex; align-items: center; background: var(--surf); 
+            padding: 18px; border: 1px solid var(--bord); border-radius: 16px;
+        }
         
         footer {
             border-top: 1px solid var(--bord);
@@ -111,8 +126,35 @@
         <h2>BRAND RANK.</h2>
         <p class="sub-head">Collective influence measurement</p>
         
-        <div id="loadingText">SYNCING_DATABASE_V2...</div>
-        <div class="rank-container" id="rankContainer"></div>
+        <div class="rank-container" id="rankContainer">
+            <div class="skeleton-card">
+                <div class="skeleton" style="width: 20px; height: 15px;"></div>
+                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
+                <div style="flex-grow: 1;">
+                    <div class="skeleton" style="width: 100px; height: 14px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
+                </div>
+                <div class="skeleton" style="width: 40px; height: 20px;"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton" style="width: 20px; height: 15px;"></div>
+                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
+                <div style="flex-grow: 1;">
+                    <div class="skeleton" style="width: 120px; height: 14px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
+                </div>
+                <div class="skeleton" style="width: 40px; height: 20px;"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton" style="width: 20px; height: 15px;"></div>
+                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
+                <div style="flex-grow: 1;">
+                    <div class="skeleton" style="width: 80px; height: 14px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
+                </div>
+                <div class="skeleton" style="width: 40px; height: 20px;"></div>
+            </div>
+        </div>
 
         <footer>
             <div class="copy-text">
@@ -130,18 +172,17 @@
 
         async function loadRankData() {
             const container = document.getElementById('rankContainer');
-            const loader = document.getElementById('loadingText');
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getRank`);
                 const data = await response.json();
 
                 if (!data || data.length === 0) {
-                    loader.innerText = "NO_DATA_AVAILABLE";
+                    container.innerHTML = "<p style='text-align:center; font-family:JetBrains Mono; font-size:10px; color:#444;'>NO_DATA_AVAILABLE</p>";
                     return;
                 }
 
-                loader.style.display = 'none';
+                // Hapus Skeleton saat data siap
                 container.innerHTML = "";
 
                 data.forEach((member, index) => {
@@ -150,12 +191,12 @@
                         display: flex; align-items: center; background: var(--surf); 
                         padding: 18px; border: 1px solid var(--bord); border-radius: 16px;
                         opacity: 0; transform: translateY(10px); animation: fadeUp 0.6s forwards ${index * 0.1}s;
+                        margin-bottom: 12px;
                     `;
 
                     const isTop1 = index === 0;
                     const rankColor = isTop1 ? "var(--accent)" : "white";
 
-                    // Bagian member[1] (Owner) dihapus untuk menjaga privasi
                     card.innerHTML = `
                         <div style="width: 35px; font-family: 'JetBrains Mono'; font-weight: 800; color: ${rankColor}; font-size: 14px;">
                             #${index + 1}
@@ -174,9 +215,7 @@
                 });
 
             } catch (err) {
-                console.error(err);
-                loader.innerText = "CONNECTION_ERROR_404";
-                loader.style.color = "#ff4444";
+                container.innerHTML = "<p style='text-align:center; font-family:JetBrains Mono; font-size:10px; color:#ff4444;'>CONNECTION_ERROR_404</p>";
             }
         }
 
