@@ -51,6 +51,9 @@
         /* CONTENT WRAPPER */
         .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
         
+        /* Custom Loading Style */
+        #loadingText { text-align: center; font-family: 'JetBrains Mono'; font-size: 10px; color: #444; letter-spacing: 4px; margin-top: 20px; text-transform: uppercase; }
+
         .stagger > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
@@ -96,7 +99,7 @@
                 <div class="dropdown-menu" id="dropdownMenu">
                     <a href="index.html">Home</a>
                     <a href="gallery.html">Gallery</a>
-                    <a href="rank.html">Rank</a>
+                    <a href="rank.html" class="active">Rank</a>
                     <a href="news.html">News</a>
                     <a href="verify.html">Check ID Card</a>
                 </div>
@@ -107,7 +110,10 @@
     <div class="wrapper stagger">
         <h2>BRAND RANK.</h2>
         <p class="sub-head">Collective influence measurement</p>
+        
+        <div id="loadingText">SYNCING_DATABASE_V2...</div>
         <div class="rank-container" id="rankContainer"></div>
+
         <footer>
             <div class="copy-text">
                 © 2026 EINHEIT COLLECTIVE<br>
@@ -117,8 +123,67 @@
     </div>
 
     <script>
+        // GANTI DENGAN URL APPS SCRIPT KAMU
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWbuZmSVJUyb3KNSdiZljxaGB3UnfsAtUT2f29vlAe545VmP5ywhoqoAsIxpFEEBko/exec";
+
         function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
         window.onclick = function(event) { if (!event.target.closest('.hamburger-wrapper')) { const menu = document.getElementById('dropdownMenu'); if (menu && menu.classList.contains('active')) menu.classList.remove('active'); } }
+
+        async function loadRankData() {
+            const container = document.getElementById('rankContainer');
+            const loader = document.getElementById('loadingText');
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getRank`);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    loader.innerText = "NO_DATA_AVAILABLE";
+                    return;
+                }
+
+                loader.style.display = 'none';
+                container.innerHTML = "";
+
+                data.forEach((member, index) => {
+                    // Data Mapping (Berdasarkan Sheet Members V2)
+                    // member[0] = ID, member[1] = Owner, member[3] = Brand, member[4] = Logo, member[9] = Likes
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        display: flex; align-items: center; background: var(--surf); 
+                        padding: 18px; border: 1px solid var(--bord); border-radius: 16px;
+                        opacity: 0; transform: translateY(10px); animation: fadeUp 0.6s forwards ${index * 0.1}s;
+                    `;
+
+                    // Style untuk Top 1
+                    const isTop1 = index === 0;
+                    const rankColor = isTop1 ? "var(--accent)" : "white";
+
+                    card.innerHTML = `
+                        <div style="width: 35px; font-family: 'JetBrains Mono'; font-weight: 800; color: ${rankColor}; font-size: 14px;">
+                            #${index + 1}
+                        </div>
+                        <img src="${member[4]}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid #1a1a1a; margin: 0 15px;">
+                        <div style="flex-grow: 1;">
+                            <div style="font-size: 13px; font-weight: 800; letter-spacing: -0.5px; color: white;">${member[3].toUpperCase()}</div>
+                            <div style="font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px;">${member[1]}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-family: 'JetBrains Mono'; color: var(--accent); font-size: 12px; font-weight: 600;">${member[9] || 0}</div>
+                            <div style="font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">POINTS</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                loader.innerText = "CONNECTION_ERROR_404";
+                loader.style.color = "#ff4444";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadRankData);
     </script>
 </body>
 </html>
