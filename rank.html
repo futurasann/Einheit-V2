@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EINHEIT | Brand Rank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #000; --surf: #0d0d0d; --bord: #222; --dim: #999; 
+            --accent: #00ff88; --max-w-desktop: 1100px; 
+        }
+        
+        * { box-sizing: border-box; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { 
+            background: var(--bg); color: white; font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden; width: 100%; 
+        }
+
+        /* NAVBAR */
+        nav { display: flex; justify-content: center; align-items: center; position: fixed; width: 100%; top: 20px; z-index: 9999; padding: 0 15px; }
+        .nav-container { 
+            width: 100%; max-width: var(--max-w-desktop); display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 25px; background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--bord); border-radius: 100px; height: 75px; 
+        }
+        .nav-logo-img { height: 55px; width: auto; }
+
+        .desktop-menu { display: none; gap: 30px; }
+        .desktop-menu a { color: var(--dim); text-decoration: none; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
+        .desktop-menu a:hover, .desktop-menu a.active { color: white; }
+
+        .hamburger-wrapper { position: relative; }
+        .hamburger { 
+            cursor: pointer; display: flex; flex-direction: column; gap: 6px; 
+            background: #1a1a1a; padding: 12px; border-radius: 50%; border: 1px solid #333;
+            width: 45px; height: 45px; justify-content: center; align-items: center;
+        }
+        .hamburger span { width: 18px; height: 2px; background: white; }
+
+        .dropdown-menu {
+            position: absolute; top: 70px; right: 0; width: 220px;
+            background: #0f0f0f; border: 1px solid var(--bord);
+            border-radius: 20px; padding: 15px; display: none;
+            flex-direction: column; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+        .dropdown-menu.active { display: flex; }
+        .dropdown-menu a { color: var(--dim); text-decoration: none; font-size: 13px; font-weight: 600; padding: 12px; border-radius: 12px; }
+        .dropdown-menu a:hover { background: #1a1a1a; color: white; }
+
+        /* CONTENT WRAPPER */
+        .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .stagger > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
+        .sub-head { color: var(--dim); font-size: 11px; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
+
+        .rank-container { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; min-height: 200px; }
+        
+        footer {
+            border-top: 1px solid var(--bord);
+            padding: 60px 20px 40px;
+            text-align: center;
+            margin-top: 100px;
+        }
+        .copy-text { 
+            font-family: 'JetBrains Mono'; font-size: 9px; color: #333; 
+            text-transform: uppercase; letter-spacing: 2px; line-height: 2;
+        }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (min-width: 992px) {
+            .desktop-menu { display: flex; }
+            .hamburger-wrapper { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="index.html"><img src="https://files.catbox.moe/iru1fz.png" class="nav-logo-img"></a>
+            <div class="desktop-menu">
+                <a href="index.html">Home</a>
+                <a href="gallery.html">Gallery</a>
+                <a href="rank.html" class="active">Rank</a>
+                <a href="news.html">News</a>
+                <a href="verify.html">Check ID Card</a>
+            </div>
+            <div class="hamburger-wrapper">
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span><span></span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="index.html">Home</a>
+                    <a href="gallery.html">Gallery</a>
+                    <a href="rank.html">Rank</a>
+                    <a href="news.html">News</a>
+                    <a href="verify.html">Check ID Card</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrapper stagger">
+        <h2>BRAND RANK.</h2>
+        <p class="sub-head">Collective influence measurement</p>
+        <div class="rank-container" id="rankContainer"></div>
+        <footer>
+            <div class="copy-text">
+                © 2026 EINHEIT COLLECTIVE<br>
+                DATA VERIFIED BY SYSTEM 2.0.4
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
+        window.onclick = function(event) { if (!event.target.closest('.hamburger-wrapper')) { const menu = document.getElementById('dropdownMenu'); if (menu && menu.classList.contains('active')) menu.classList.remove('active'); } }
+    </script>
+</body>
+</html>

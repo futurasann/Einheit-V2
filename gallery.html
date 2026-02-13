@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EINHEIT | Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #000; --surf: #0d0d0d; --bord: #222; --dim: #999; 
+            --max-w-desktop: 1100px; 
+            --accent: #00ff88;
+        }
+        
+        * { box-sizing: border-box; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { 
+            background: var(--bg); color: white; font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden; width: 100%; 
+        }
+
+        /* NAVBAR */
+        nav { 
+            display: flex; justify-content: center; align-items: center; 
+            position: fixed; width: 100%; top: 20px; left: 0; z-index: 9999; 
+            padding: 0 15px;
+        }
+        
+        .nav-container { 
+            width: 100%; max-width: var(--max-w-desktop); 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 25px; 
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--bord); border-radius: 100px;
+            height: 75px; min-height: 75px;
+        }
+
+        .nav-logo-img { height: 55px; width: auto; flex-shrink: 0; }
+
+        .desktop-menu { display: none; gap: 30px; }
+        .desktop-menu a { 
+            color: var(--dim); text-decoration: none; font-size: 11px; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 2px; 
+        }
+        .desktop-menu a:hover { color: white; }
+
+        .hamburger-wrapper { position: relative; display: flex; align-items: center; }
+        .hamburger { 
+            cursor: pointer; display: flex; flex-direction: column; gap: 5px; 
+            background: #1a1a1a; padding: 12px; border-radius: 50%; border: 1px solid #333;
+            width: 45px; height: 45px; justify-content: center; align-items: center;
+        }
+        .hamburger span { width: 18px; height: 2px; background: white; }
+
+        .dropdown-menu {
+            position: absolute; top: 70px; right: 0; width: 220px;
+            background: #0f0f0f; border: 1px solid var(--bord);
+            border-radius: 20px; padding: 15px; display: none;
+            flex-direction: column; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        .dropdown-menu.active { display: flex; }
+        .dropdown-menu a { 
+            color: var(--dim); text-decoration: none; font-size: 13px; 
+            font-weight: 600; padding: 12px; border-radius: 12px; 
+        }
+        .dropdown-menu a:hover { background: #1a1a1a; color: white; }
+
+        /* CONTENT WRAPPER */
+        .wrapper { 
+            width: 100%; max-width: var(--max-w-desktop); 
+            margin: 0 auto; padding: 145px 20px 40px; 
+        }
+
+        /* HEADER SECTION WITH BUTTON ON RIGHT */
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 50px;
+            border-bottom: 1px solid var(--bord);
+            padding-bottom: 20px;
+        }
+
+        h2 { font-size: clamp(32px, 5vw, 48px); font-weight: 800; letter-spacing: -2px; margin: 0; }
+        
+        .btn-add-product {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: black;
+            padding: 14px 24px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+        }
+        .btn-add-product:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+
+        .g-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; text-align: left;
+        }
+
+        .g-card { 
+            background: var(--surf); border: 1px solid var(--bord); 
+            border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .img-box { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #111; }
+        .g-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s ease; }
+        .g-card:hover img { transform: scale(1.05); }
+
+        .g-info { padding: 15px; flex-grow: 1; }
+        .g-info h3 { font-size: 11px; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .g-info p { font-size: 9px; color: var(--dim); margin: 5px 0 0; font-family: 'JetBrains Mono'; }
+
+        /* INTERACTIONS */
+        .g-interactions {
+            padding: 12px 15px;
+            border-top: 1px solid var(--bord);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .btn-like {
+            background: none; border: none; color: var(--dim);
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; padding: 0; font-size: 12px; font-weight: 600;
+        }
+        .btn-like svg { width: 16px; height: 16px; fill: currentColor; }
+        .btn-like.active { color: #ff4757; }
+
+        .vote-badge {
+            background: #151515; border: 1px solid var(--bord);
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 9px; font-weight: 800; color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* SKELETON */
+        .skeleton {
+            background: linear-gradient(90deg, #0d0d0d 25%, #1a1a1a 50%, #0d0d0d 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite linear;
+        }
+        @keyframes shimmer { to { background-position: -200% 0; } }
+
+        /* FOOTER */
+        footer { margin-top: 80px; padding: 60px 0; border-top: 1px solid var(--bord); text-align: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* OVERLAYS */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 10001;
+        }
+        .modal-card {
+            background: var(--surf); border: 1px solid var(--bord);
+            padding: 30px; border-radius: 24px; width: 90%; max-width: 340px; text-align: center;
+        }
+        
+        .stars { display: flex; justify-content: center; gap: 8px; margin: 25px 0; }
+        .star { font-size: 32px; cursor: pointer; color: #222; }
+        .star.active { color: var(--accent); }
+        
+        .btn-primary { width: 100%; padding: 14px; border-radius: 12px; border: none; background: white; color: black; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-ghost { background: none; border: none; color: var(--dim); margin-top: 15px; font-size: 11px; cursor: pointer; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { opacity: 0; animation: fadeUp 0.8s ease forwards; }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 600px) {
+            .gallery-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .btn-add-product { width: 100%; justify-content: center; }
+            .g-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+        @media (min-width: 992px) {
+            .desktop-menu { display: flex; }
+            .hamburger-wrapper { display: none; }
+            .g-grid { grid-template-columns: repeat(4, 1fr); } 
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="index.html"><img src="https://files.catbox.moe/iru1fz.png" class="nav-logo-img"></a>
+            <div class="desktop-menu">
+                <a href="index.html">Home</a>
+                <a href="gallery.html" style="color: white;">Gallery</a>
+                <a href="rank.html">Rank</a>
+                <a href="news.html">News</a>
+                <a href="verify.html">Check ID Card</a>
+            </div>
+            <div class="hamburger-wrapper">
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span><span></span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="index.html">Home</a>
+                    <a href="gallery.html">Gallery</a>
+                    <a href="rank.html">Rank</a>
+                    <a href="news.html">News</a>
+                    <a href="verify.html">Check ID Card</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <header class="gallery-header animate">
+            <h2>Einheit Gallery.</h2>
+            <a href="add-product.html" class="btn-add-product">
+                <span style="font-size: 18px; line-height: 0;">+</span> Add Your Product
+            </a>
+        </header>
+
+        <div id="galleryContainer" class="g-grid">
+            <div class="g-card sk-item">
+                <div class="img-box skeleton"></div>
+                <div class="g-info" style="padding: 20px;"><div style="height: 12px; width: 80%; background: #1a1a1a; border-radius: 4px;"></div></div>
+            </div>
+            <div class="g-card sk-item">
+                <div class="img-box skeleton"></div>
+                <div class="g-info" style="padding: 20px;"><div style="height: 12px; width: 80%; background: #1a1a1a; border-radius: 4px;"></div></div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="copyright animate">© 2026 EINHEIT COLLECTIVE. ALL RIGHTS RESERVED.</div>
+        </footer>
+    </div>
+
+    <div class="overlay" id="voteOverlay">
+        <div class="modal-card">
+            <h4 id="voteName">Product Name</h4>
+            <p style="font-size: 12px; color: var(--dim);">Beri rating untuk gear ini.</p>
+            <div class="stars" id="starBox">
+                <span class="star" onclick="setStar(1)">★</span><span class="star" onclick="setStar(2)">★</span><span class="star" onclick="setStar(3)">★</span><span class="star" onclick="setStar(4)">★</span><span class="star" onclick="setStar(5)">★</span>
+            </div>
+            <button class="btn-primary" onclick="submitVote()">Submit Rating</button>
+            <button class="btn-ghost" onclick="closeVote()">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="notifOverlay">
+        <div class="modal-card">
+            <h4 style="color: var(--accent);">Success!</h4>
+            <p id="notifMsg" style="font-size: 12px; color: var(--dim); margin: 15px 0 25px;"></p>
+            <button class="btn-primary" onclick="closeNotif()">Great</button>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbweaUSUwTt499wZ45tEoU0qa05Ki4daybypglxPG6BRABdNSZMOdvt5-mJyWooM3n4/exec';
+        let isFirstLoad = true;
+        let selectedStar = 0;
+        let currentVoteName = "";
+
+        function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
+        window.onclick = function(event) { if (!event.target.closest('.hamburger-wrapper')) { const menu = document.getElementById('dropdownMenu'); if (menu && menu.classList.contains('active')) menu.classList.remove('active'); } }
+
+        function renderGallery(data, cachedSerials = []) {
+            const container = document.getElementById('galleryContainer');
+            if(container.querySelector('.sk-item')) container.innerHTML = '';
+
+            container.innerHTML = data.map((item, i) => {
+                const serial = item[1];
+                const shouldAnimate = isFirstLoad || !cachedSerials.includes(serial);
+                return `
+                    <div class="g-card ${shouldAnimate ? 'animate' : ''}" style="${shouldAnimate ? `animation-delay: ${i*0.05}s` : ''}">
+                        <div class="img-box"><img src="${item[2]}" loading="lazy"></div>
+                        <div class="g-info"><h3>${item[0]}</h3><p>SERIAL: ${item[1]}</p></div>
+                        <div class="g-interactions">
+                            <button class="btn-like" onclick="toggleLike(this)">
+                                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                <span>0</span>
+                            </button>
+                            <div class="vote-badge" onclick="openVote('${item[0]}')">⭐ 0.0</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function fetchGallery() {
+            const cachedRaw = localStorage.getItem('einheit_gallery_cache');
+            let cachedData = cachedRaw ? JSON.parse(cachedRaw) : [];
+            if (cachedRaw) { renderGallery(cachedData, []); isFirstLoad = false; }
+            try {
+                const response = await fetch(`${scriptURL}?action=getGallery`);
+                const freshData = await response.json();
+                if (freshData && freshData.length > 0) {
+                    renderGallery(freshData, cachedData.map(d => d[1]));
+                    localStorage.setItem('einheit_gallery_cache', JSON.stringify(freshData));
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('active');
+            let s = btn.querySelector('span');
+            s.innerText = btn.classList.contains('active') ? parseInt(s.innerText)+1 : parseInt(s.innerText)-1;
+        }
+
+        function openVote(name) { 
+            currentVoteName = name; 
+            document.getElementById('voteName').innerText = name; 
+            document.getElementById('voteOverlay').style.display = 'flex'; 
+            setStar(0); 
+        }
+        function closeVote() { document.getElementById('voteOverlay').style.display = 'none'; }
+        function setStar(n) { selectedStar = n; document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n)); }
+        function submitVote() { 
+            if(!selectedStar) return; 
+            closeVote();
+            document.getElementById('notifMsg').innerText = `Rating ${selectedStar} bintang untuk ${currentVoteName} tersimpan.`;
+            document.getElementById('notifOverlay').style.display = 'flex';
+        }
+        function closeNotif() { document.getElementById('notifOverlay').style.display = 'none'; }
+
+        fetchGallery();
+    </script>
+</body>
+</html>
