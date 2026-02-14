@@ -17,6 +17,17 @@
             margin: 0; padding: 0; overflow-x: hidden; width: 100%; 
         }
 
+        /* SKELETON ANIMATION */
+        .skeleton {
+            background: linear-gradient(90deg, #0d0d0d 25%, #1a1a1a 50%, #0d0d0d 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
         /* NAVBAR */
         nav { display: flex; justify-content: center; align-items: center; position: fixed; width: 100%; top: 20px; z-index: 9999; padding: 0 15px; }
         .nav-container { 
@@ -50,8 +61,7 @@
 
         /* CONTENT WRAPPER */
         .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
-        .stagger > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-
+        
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
         .sub-head { color: var(--dim); font-size: 11px; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
 
@@ -82,6 +92,7 @@
         .power-label { font-size: 7px; color: #444; letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         @media (min-width: 992px) {
             .desktop-menu { display: flex; }
@@ -116,27 +127,30 @@
         </div>
     </nav>
 
-    <div class="wrapper stagger">
-        <h2>LEADERBOARD.</h2>
-        <p class="sub-head">Collective influence measurement</p>
+    <div class="wrapper">
+        <h2 class="animate">LEADERBOARD.</h2>
+        <p class="sub-head animate">Collective influence measurement</p>
         
         <div class="rank-container" id="rankContainer">
-            </div>
+            <div class="rank-card skeleton" style="height: 92px; border:none;"></div>
+            <div class="rank-card skeleton" style="height: 92px; border:none;"></div>
+            <div class="rank-card skeleton" style="height: 92px; border:none;"></div>
+        </div>
 
         <footer style="margin-top: 80px; text-align: center; padding: 40px 0;">
             <div style="font-family: 'JetBrains Mono'; font-size: 9px; color: #333; text-transform: uppercase; letter-spacing: 2px;">
                 © 2026 EINHEIT COLLECTIVE<br>
-                DATA VERIFIED BY SYSTEM 2.0.4
+                DATA VERIFIED BY SYSTEM 2.0.5
             </div>
         </footer>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUIta-Xqf2gqQWFL_qolQdMxsb4pAX0tLjRjtQ0PWJtnrtd9q6nh5HgxuI1RoCGNva/exec";
+        // Gunakan URL Apps Script versi terbaru
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytNFfuyoQL4ZU_j5lnFUIwCtYZAGmW08UNj8YV7QC0aZEmbAczeFQsp-dCreH9iaCg/exec";
 
         function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
         
-        // Tutup menu jika klik di luar
         window.onclick = function(event) { 
             if (!event.target.closest('.hamburger-wrapper')) { 
                 const menu = document.getElementById('dropdownMenu'); 
@@ -146,47 +160,53 @@
 
         async function loadRank() {
             const container = document.getElementById('rankContainer');
-            container.innerHTML = "<p style='text-align:center; font-size:10px; color:#444;'>LOADING_DATABASE...</p>";
+            const cacheKey = 'einheit_rank_cache';
+
+            // 1. CEK CACHE
+            const cachedData = sessionStorage.getItem(cacheKey);
+            if (cachedData) {
+                renderRank(JSON.parse(cachedData));
+            }
 
             try {
+                // 2. FETCH DATA BARU
                 const response = await fetch(`${SCRIPT_URL}?action=getRank`);
                 const data = await response.json();
 
-                container.innerHTML = "";
-
-                if (!data || data.length === 0) {
+                if (data && data.length > 0) {
+                    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+                    renderRank(data);
+                } else if (!cachedData) {
                     container.innerHTML = "<p style='text-align:center;'>NO_DATA_FOUND</p>";
-                    return;
                 }
-
-                data.forEach((item, index) => {
-                    const card = document.createElement('div');
-                    card.className = `rank-card ${index === 0 ? 'top-1' : ''}`;
-                    card.style.animationDelay = `${index * 0.1}s`;
-                    card.style.opacity = "0"; 
-                    card.style.animation = "fadeUp 0.6s forwards";
-
-                    card.innerHTML = `
-                        <div class="rank-num">#${index + 1}</div>
-                        <img src="${item[4] || 'https://via.placeholder.com/100'}" class="brand-logo">
-                        <div class="brand-detail">
-                            <div class="brand-name">${item[3]}</div>
-                            <div class="brand-owner">BY ${item[1]}</div>
-                            <div class="manual-scores">
-                                <span class="score-tag">🎨 ${item[10] || '0/10'}</span>
-                                <span class="score-tag">⚙️ ${item[11] || '-'}</span>
-                            </div>
-                        </div>
-                        <div class="power-box">
-                            <div class="power-val">${item[9] || 0}</div>
-                            <div class="power-label">POWER INDEX</div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
             } catch (err) {
-                container.innerHTML = "<p style='text-align:center; color:red;'>CONNECTION_ERROR</p>";
+                console.error("Rank fetch error:", err);
+                if (!cachedData) {
+                    container.innerHTML = "<p style='text-align:center; color:red;'>CONNECTION_ERROR</p>";
+                }
             }
+        }
+
+        function renderRank(data) {
+            const container = document.getElementById('rankContainer');
+            container.innerHTML = data.map((item, index) => `
+                <div class="rank-card ${index === 0 ? 'top-1' : ''} animate" style="animation-delay: ${index * 0.05}s">
+                    <div class="rank-num">#${index + 1}</div>
+                    <img src="${item[4] || 'https://via.placeholder.com/100'}" class="brand-logo" onerror="this.src='https://via.placeholder.com/100'">
+                    <div class="brand-detail">
+                        <div class="brand-name">${item[3]}</div>
+                        <div class="brand-owner">BY ${item[1]}</div>
+                        <div class="manual-scores">
+                            <span class="score-tag">🎨 ${item[10] || '0/10'}</span>
+                            <span class="score-tag">⚙️ ${item[11] || '-'}</span>
+                        </div>
+                    </div>
+                    <div class="power-box">
+                        <div class="power-val">${item[9] || 0}</div>
+                        <div class="power-label">POWER INDEX</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         document.addEventListener('DOMContentLoaded', loadRank);
