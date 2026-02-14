@@ -37,23 +37,32 @@
         }
         .hamburger span { width: 18px; height: 2px; background: white; }
 
+        .dropdown-menu {
+            position: absolute; top: 70px; right: 0; width: 220px;
+            background: #0f0f0f; border: 1px solid var(--bord);
+            border-radius: 20px; padding: 15px; display: none;
+            flex-direction: column; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+        .dropdown-menu.active { display: flex; }
+        .dropdown-menu a { color: var(--dim); text-decoration: none; font-size: 13px; font-weight: 600; padding: 12px; border-radius: 12px; }
+        .dropdown-menu a:hover { background: #1a1a1a; color: white; }
+
         /* CONTENT WRAPPER */
         .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
-        
         .stagger > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
         .sub-head { color: var(--dim); font-size: 11px; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
 
-        .rank-container { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+        .rank-container { display: flex; flex-direction: column; gap: 12px; }
 
-        /* RANK CARD STYLING */
+        /* RANK CARD */
         .rank-card {
             display: flex; align-items: center; background: var(--surf); 
             padding: 20px; border: 1px solid var(--bord); border-radius: 20px;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; margin-bottom: 12px;
         }
-
         .rank-card.top-1 { border-color: var(--accent); background: linear-gradient(145deg, #0d0d0d, #051a10); }
 
         .rank-num { width: 40px; font-family: 'JetBrains Mono'; font-weight: 800; font-size: 16px; color: var(--dim); }
@@ -65,8 +74,7 @@
         .brand-name { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; }
         .brand-owner { font-size: 10px; color: var(--dim); margin-top: 2px; }
         
-        /* New Manual Assessment Info */
-        .manual-scores { display: flex; gap: 10px; margin-top: 8px; }
+        .manual-scores { display: flex; gap: 8px; margin-top: 8px; }
         .score-tag { font-size: 8px; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; color: var(--accent); border: 1px solid #333; font-weight: 600; }
 
         .power-box { text-align: right; }
@@ -74,60 +82,88 @@
         .power-label { font-size: 7px; color: #444; letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (min-width: 992px) {
+            .desktop-menu { display: flex; }
+            .hamburger-wrapper { display: none; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-container">
-            <a href="index.html"><img src="https://files.catbox.moe/iru1fz.png" class="nav-logo-img"></a>
+            <a href="./"><img src="https://files.catbox.moe/iru1fz.png" class="nav-logo-img"></a>
             <div class="desktop-menu">
-                <a href="index.html">Home</a>
-                <a href="gallery.html">Gallery</a>
-                <a href="rank.html" class="active">Rank</a>
-                <a href="news.html">News</a>
-                <a href="verify.html">Check ID Card</a>
+                <a href="./">Home</a>
+                <a href="gallery">Gallery</a>
+                <a href="rank" class="active">Rank</a>
+                <a href="news">News</a>
+                <a href="verify">Check ID Card</a>
             </div>
+            <div class="hamburger-wrapper">
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span><span></span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="./">Home</a>
+                    <a href="gallery">Gallery</a>
+                    <a href="rank" class="active">Rank</a>
+                    <a href="news">News</a>
+                    <a href="verify">Check ID Card</a>
+                </div>
             </div>
+        </div>
     </nav>
 
     <div class="wrapper stagger">
         <h2>LEADERBOARD.</h2>
-        <p class="sub-head">Ranked by Specs & Aesthetics</p>
+        <p class="sub-head">Collective influence measurement</p>
         
         <div class="rank-container" id="rankContainer">
             </div>
 
-        <footer style="margin-top: 80px; text-align: center; opacity: 0.3; font-size: 9px; font-family: 'JetBrains Mono';">
-            VERIFIED ASSESSMENT SYSTEM // 2026
+        <footer style="margin-top: 80px; text-align: center; padding: 40px 0;">
+            <div style="font-family: 'JetBrains Mono'; font-size: 9px; color: #333; text-transform: uppercase; letter-spacing: 2px;">
+                © 2026 EINHEIT COLLECTIVE<br>
+                DATA VERIFIED BY SYSTEM 2.0.4
+            </div>
         </footer>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytNFfuyoQL4ZU_j5lnFUIwCtYZAGmW08UNj8YV7QC0aZEmbAczeFQsp-dCreH9iaCg/exec";
 
+        function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
+        
+        // Tutup menu jika klik di luar
+        window.onclick = function(event) { 
+            if (!event.target.closest('.hamburger-wrapper')) { 
+                const menu = document.getElementById('dropdownMenu'); 
+                if (menu && menu.classList.contains('active')) menu.classList.remove('active'); 
+            } 
+        }
+
         async function loadRank() {
             const container = document.getElementById('rankContainer');
+            container.innerHTML = "<p style='text-align:center; font-size:10px; color:#444;'>LOADING_DATABASE...</p>";
+
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getRank`);
                 const data = await response.json();
 
                 container.innerHTML = "";
 
+                if (!data || data.length === 0) {
+                    container.innerHTML = "<p style='text-align:center;'>NO_DATA_FOUND</p>";
+                    return;
+                }
+
                 data.forEach((item, index) => {
-                    /* Mapping berdasarkan strukturmu:
-                       item[3] = Brand Name (D)
-                       item[4] = Logo URL (E)
-                       item[1] = Owner Name (B)
-                       item[9] = Power Index (J) - Penentu Rank
-                       item[10] = Design Score (K)
-                       item[11] = Spec Level (L)
-                    */
-                    
                     const card = document.createElement('div');
                     card.className = `rank-card ${index === 0 ? 'top-1' : ''}`;
                     card.style.animationDelay = `${index * 0.1}s`;
-                    card.style.opacity = "0"; // Triggered by fadeUp animation
+                    card.style.opacity = "0"; 
                     card.style.animation = "fadeUp 0.6s forwards";
 
                     card.innerHTML = `
@@ -137,8 +173,8 @@
                             <div class="brand-name">${item[3]}</div>
                             <div class="brand-owner">BY ${item[1]}</div>
                             <div class="manual-scores">
-                                <span class="score-tag">🎨 ${item[10] || 'N/A'}</span>
-                                <span class="score-tag">⚙️ ${item[11] || 'N/A'}</span>
+                                <span class="score-tag">🎨 ${item[10] || '0/10'}</span>
+                                <span class="score-tag">⚙️ ${item[11] || '-'}</span>
                             </div>
                         </div>
                         <div class="power-box">
@@ -149,11 +185,11 @@
                     container.appendChild(card);
                 });
             } catch (err) {
-                container.innerHTML = "<p style='text-align:center;'>FAILED_TO_LOAD_DATABASE</p>";
+                container.innerHTML = "<p style='text-align:center; color:red;'>CONNECTION_ERROR</p>";
             }
         }
 
-        loadRank();
+        document.addEventListener('DOMContentLoaded', loadRank);
     </script>
 </body>
 </html>
