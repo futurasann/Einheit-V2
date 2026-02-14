@@ -37,17 +37,6 @@
         }
         .hamburger span { width: 18px; height: 2px; background: white; }
 
-        .dropdown-menu {
-            position: absolute; top: 70px; right: 0; width: 220px;
-            background: #0f0f0f; border: 1px solid var(--bord);
-            border-radius: 20px; padding: 15px; display: none;
-            flex-direction: column; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            z-index: 100;
-        }
-        .dropdown-menu.active { display: flex; }
-        .dropdown-menu a { color: var(--dim); text-decoration: none; font-size: 13px; font-weight: 600; padding: 12px; border-radius: 12px; }
-        .dropdown-menu a:hover { background: #1a1a1a; color: white; }
-
         /* CONTENT WRAPPER */
         .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 150px 20px 40px; min-height: 100vh; display: flex; flex-direction: column; }
         
@@ -56,43 +45,35 @@
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; text-align: center; }
         .sub-head { color: var(--dim); font-size: 11px; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
 
-        .rank-container { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; min-height: 200px; }
+        .rank-container { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
 
-        /* SKELETON ANIMATION */
-        .skeleton {
-            background: linear-gradient(90deg, #0d0d0d 25%, #1a1a1a 50%, #0d0d0d 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 4px;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .skeleton-card {
+        /* RANK CARD STYLING */
+        .rank-card {
             display: flex; align-items: center; background: var(--surf); 
-            padding: 18px; border: 1px solid var(--bord); border-radius: 16px;
+            padding: 20px; border: 1px solid var(--bord); border-radius: 20px;
+            position: relative; overflow: hidden;
         }
+
+        .rank-card.top-1 { border-color: var(--accent); background: linear-gradient(145deg, #0d0d0d, #051a10); }
+
+        .rank-num { width: 40px; font-family: 'JetBrains Mono'; font-weight: 800; font-size: 16px; color: var(--dim); }
+        .top-1 .rank-num { color: var(--accent); }
+
+        .brand-logo { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; margin: 0 15px; border: 1px solid var(--bord); }
+
+        .brand-detail { flex-grow: 1; }
+        .brand-name { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; }
+        .brand-owner { font-size: 10px; color: var(--dim); margin-top: 2px; }
         
-        footer {
-            border-top: 1px solid var(--bord);
-            padding: 60px 20px 40px;
-            text-align: center;
-            margin-top: 100px;
-        }
-        .copy-text { 
-            font-family: 'JetBrains Mono'; font-size: 9px; color: #333; 
-            text-transform: uppercase; letter-spacing: 2px; line-height: 2;
-        }
+        /* New Manual Assessment Info */
+        .manual-scores { display: flex; gap: 10px; margin-top: 8px; }
+        .score-tag { font-size: 8px; background: #1a1a1a; padding: 3px 8px; border-radius: 4px; color: var(--accent); border: 1px solid #333; font-weight: 600; }
+
+        .power-box { text-align: right; }
+        .power-val { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 16px; font-weight: 800; }
+        .power-label { font-size: 7px; color: #444; letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (min-width: 992px) {
-            .desktop-menu { display: flex; }
-            .hamburger-wrapper { display: none; }
-        }
     </style>
 </head>
 <body>
@@ -107,119 +88,72 @@
                 <a href="news.html">News</a>
                 <a href="verify.html">Check ID Card</a>
             </div>
-            <div class="hamburger-wrapper">
-                <div class="hamburger" onclick="toggleMenu()">
-                    <span></span><span></span>
-                </div>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="index.html">Home</a>
-                    <a href="gallery.html">Gallery</a>
-                    <a href="rank.html" class="active">Rank</a>
-                    <a href="news.html">News</a>
-                    <a href="verify.html">Check ID Card</a>
-                </div>
             </div>
-        </div>
     </nav>
 
     <div class="wrapper stagger">
-        <h2>BRAND RANK.</h2>
-        <p class="sub-head">Collective influence measurement</p>
+        <h2>LEADERBOARD.</h2>
+        <p class="sub-head">Ranked by Specs & Aesthetics</p>
         
         <div class="rank-container" id="rankContainer">
-            <div class="skeleton-card">
-                <div class="skeleton" style="width: 20px; height: 15px;"></div>
-                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
-                <div style="flex-grow: 1;">
-                    <div class="skeleton" style="width: 100px; height: 14px; margin-bottom: 8px;"></div>
-                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
-                </div>
-                <div class="skeleton" style="width: 40px; height: 20px;"></div>
             </div>
-            <div class="skeleton-card">
-                <div class="skeleton" style="width: 20px; height: 15px;"></div>
-                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
-                <div style="flex-grow: 1;">
-                    <div class="skeleton" style="width: 120px; height: 14px; margin-bottom: 8px;"></div>
-                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
-                </div>
-                <div class="skeleton" style="width: 40px; height: 20px;"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton" style="width: 20px; height: 15px;"></div>
-                <div class="skeleton" style="width: 42px; height: 42px; border-radius: 50%; margin: 0 15px;"></div>
-                <div style="flex-grow: 1;">
-                    <div class="skeleton" style="width: 80px; height: 14px; margin-bottom: 8px;"></div>
-                    <div class="skeleton" style="width: 60px; height: 8px;"></div>
-                </div>
-                <div class="skeleton" style="width: 40px; height: 20px;"></div>
-            </div>
-        </div>
 
-        <footer>
-            <div class="copy-text">
-                © 2026 EINHEIT COLLECTIVE<br>
-                DATA VERIFIED BY SYSTEM 2.0.4
-            </div>
+        <footer style="margin-top: 80px; text-align: center; opacity: 0.3; font-size: 9px; font-family: 'JetBrains Mono';">
+            VERIFIED ASSESSMENT SYSTEM // 2026
         </footer>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWbuZmSVJUyb3KNSdiZljxaGB3UnfsAtUT2f29vlAe545VmP5ywhoqoAsIxpFEEBko/exec";
+        const SCRIPT_URL = "URL_APPS_SCRIPT_KAMU";
 
-        function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('active'); }
-        window.onclick = function(event) { if (!event.target.closest('.hamburger-wrapper')) { const menu = document.getElementById('dropdownMenu'); if (menu && menu.classList.contains('active')) menu.classList.remove('active'); } }
-
-        async function loadRankData() {
+        async function loadRank() {
             const container = document.getElementById('rankContainer');
-
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getRank`);
                 const data = await response.json();
 
-                if (!data || data.length === 0) {
-                    container.innerHTML = "<p style='text-align:center; font-family:JetBrains Mono; font-size:10px; color:#444;'>NO_DATA_AVAILABLE</p>";
-                    return;
-                }
-
-                // Hapus Skeleton saat data siap
                 container.innerHTML = "";
 
-                data.forEach((member, index) => {
+                data.forEach((item, index) => {
+                    /* Mapping berdasarkan strukturmu:
+                       item[3] = Brand Name (D)
+                       item[4] = Logo URL (E)
+                       item[1] = Owner Name (B)
+                       item[9] = Power Index (J) - Penentu Rank
+                       item[10] = Design Score (K)
+                       item[11] = Spec Level (L)
+                    */
+                    
                     const card = document.createElement('div');
-                    card.style.cssText = `
-                        display: flex; align-items: center; background: var(--surf); 
-                        padding: 18px; border: 1px solid var(--bord); border-radius: 16px;
-                        opacity: 0; transform: translateY(10px); animation: fadeUp 0.6s forwards ${index * 0.1}s;
-                        margin-bottom: 12px;
-                    `;
-
-                    const isTop1 = index === 0;
-                    const rankColor = isTop1 ? "var(--accent)" : "white";
+                    card.className = `rank-card ${index === 0 ? 'top-1' : ''}`;
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.style.opacity = "0"; // Triggered by fadeUp animation
+                    card.style.animation = "fadeUp 0.6s forwards";
 
                     card.innerHTML = `
-                        <div style="width: 35px; font-family: 'JetBrains Mono'; font-weight: 800; color: ${rankColor}; font-size: 14px;">
-                            #${index + 1}
+                        <div class="rank-num">#${index + 1}</div>
+                        <img src="${item[4] || 'https://via.placeholder.com/100'}" class="brand-logo">
+                        <div class="brand-detail">
+                            <div class="brand-name">${item[3]}</div>
+                            <div class="brand-owner">BY ${item[1]}</div>
+                            <div class="manual-scores">
+                                <span class="score-tag">🎨 ${item[10] || 'N/A'}</span>
+                                <span class="score-tag">⚙️ ${item[11] || 'N/A'}</span>
+                            </div>
                         </div>
-                        <img src="${member[4]}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid #1a1a1a; margin: 0 15px;">
-                        <div style="flex-grow: 1;">
-                            <div style="font-size: 13px; font-weight: 800; letter-spacing: -0.5px; color: white;">${member[3].toUpperCase()}</div>
-                            <div style="font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px;">VERIFIED UNIT</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-family: 'JetBrains Mono'; color: var(--accent); font-size: 12px; font-weight: 600;">${member[9] || 0}</div>
-                            <div style="font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">POINTS</div>
+                        <div class="power-box">
+                            <div class="power-val">${item[9] || 0}</div>
+                            <div class="power-label">POWER INDEX</div>
                         </div>
                     `;
                     container.appendChild(card);
                 });
-
             } catch (err) {
-                container.innerHTML = "<p style='text-align:center; font-family:JetBrains Mono; font-size:10px; color:#ff4444;'>CONNECTION_ERROR_404</p>";
+                container.innerHTML = "<p style='text-align:center;'>FAILED_TO_LOAD_DATABASE</p>";
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadRankData);
+        loadRank();
     </script>
 </body>
 </html>
